@@ -5,8 +5,11 @@
 
 
 ```bash
-git clone git@github.com:Mathieu-Cieslar/sdis-emergency.git
+git clone https://github.com/Mathieu-Cieslar/sdis-emergency.git
 ```
 ```bash
-git clone git@github.com:Mathieu-Cieslar/sdis-simulation.git
+git clone https://github.com/Mathieu-Cieslar/sdis-simulation.git
+```
+```bash
+git clone https://github.com/EtienneCHZ/IOT.git
 ```
