@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # Backend Simulator
+  simulator-backend:
+    build:
+      context: ./simulator-backend
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://simulator-db:5432/simulator
+      - SPRING_DATASOURCE_USERNAME=simulator_user
+      - SPRING_DATASOURCE_PASSWORD=simulator_password
+    depends_on:
+      - simulator-db
+
+  # Backend Emergency
+  emergency-backend:
+    build:
+      context: ./emergency-backend
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://emergency-db:5432/emergency
+      - SPRING_DATASOURCE_USERNAME=emergency_user
+      - SPRING_DATASOURCE_PASSWORD=emergency_password
+    depends_on:
+      - emergency-db
+
+  # Frontend Simulator
+  simulator-frontend:
+    build:
+      context: ./simulator-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:80"
+
+  # Frontend Emergency
+  emergency-frontend:
+    build:
+      context: ./emergency-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3002:80"
+
+  # Base de données Simulator
+  simulator-db:
+    image: postgres:15
+    container_name: simulator-db
+    environment:
+      POSTGRES_DB: simulator
+      POSTGRES_USER: simulator_user
+      POSTGRES_PASSWORD: simulator_password
+    volumes:
+      - simulator-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  # Base de données Emergency
+  emergency-db:
+    image: postgres:15
+    container_name: emergency-db
+    environment:
+      POSTGRES_DB: emergency
+      POSTGRES_USER: emergency_user
+      POSTGRES_PASSWORD: emergency_password
+    volumes:
+      - emergency-data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+
+volumes:
+  simulator-data:
+  emergency-data:
