@@ -2,34 +2,48 @@ version: '3.8'
 services:
   frontend:
     build:
-      context: ./sdis-emergency/Emergency-Manager/frontend
+      context: ./sdis-emergency/Emergency-Manager/front
       dockerfile: Dockerfile
     ports:
-      - "80:80"
-
-  emergency-manager:
+      - "8080:8080"
+    networks:
+        - net
+    volumes:
+      - ./sdis-emergency/Emergency-Manager/front:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+  backend:
     build:
       context: ./sdis-emergency/Emergency-Manager
       dockerfile: Dockerfile
     environment:
-      - QUARKUS_DATASOURCE_URL=jdbc:postgresql://database:5432/emergency_db
-      - QUARKUS_DATASOURCE_USERNAME=admin
-      - QUARKUS_DATASOURCE_PASSWORD=admin
+      DATABASE_URL: "postgresql://admin:admin@database:5432/emergency_db"
+    volumes:
+      - ./sdis-emergency/Emergency-Manager:/var/www/html
     depends_on:
       - database
+    networks:
+      - net
     ports:
-      - "8080:8080"
-
+      - "8081:80"  # Correction ici pour éviter le conflit de port
   database:
     image: postgres:15
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: emergency_db
+    networks:
+      - net
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+networks:
+  net:
+    name: sdis-emergency
+    external: true
 
 volumes:
   postgres_data:
