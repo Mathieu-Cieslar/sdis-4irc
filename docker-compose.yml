@@ -39,6 +39,44 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+  frontend-simu:
+    build:
+      context: ./sdis-simulation/Simulator/front
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    networks:
+      - net
+    volumes:
+      - ./sdis-simulation/Simulator/front:/app
+    depends_on:
+      - backend-simu
+  backend-simu:
+    build:
+      context: ./sdis-simulation/Simulator
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: "postgresql://admin:admin@database-simu:5432/simu_db"
+    volumes:
+      - ./sdis-simulation/Simulator:/var/www/html
+    depends_on:
+      - database-simu
+    networks:
+      - net
+    ports:
+      - "8083:80"  # Correction ici pour éviter le conflit de port
+  database-simu:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: simu_db
+    networks:
+      - net
+    volumes:
+      - postgres_data_simu:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
 
 networks:
   net:
@@ -47,3 +85,4 @@ networks:
 
 volumes:
   postgres_data:
+  postgres_data_simu:
