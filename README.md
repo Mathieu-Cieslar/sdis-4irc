@@ -25,6 +25,13 @@ Créer le network docker avant de build et up le projet
 ```bash
 docker network create sdis-emergency
 ```
+
+Lancement des containers
+
+```bash
+docker-compose up -d --build
+```
+
 Installation des dépendances sur les back web Symfony
 
 ```bash
