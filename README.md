@@ -35,7 +35,7 @@ docker-compose up -d --build
 Installation des dépendances sur les back web Symfony
 
 ```bash
-php bin/console composer install 
+composer install 
 ```
 Lancement des migrations
 ```bash
