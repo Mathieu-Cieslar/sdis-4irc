@@ -1,5 +1,54 @@
+# gb_EX4oyX4ZCXfUE8EtIi6uU7LGLbMmt8RU56Foo7uUJR2RqdqBSxw2jciTvixflB9GDjay_30kgdwUAAiP5BA==
+
 version: '3.8'
 services:
+  influxdb:
+    image: influxdb:2
+    ports:
+        - 8086:8086
+    volumes:
+        - ./data:/var/lib/influxdb2
+        - ./config:/etc/influxdb2
+    environment:
+        - DOCKER_INFLUXDB_INIT_MODE=setup
+        - DOCKER_INFLUXDB_INIT_USERNAME=admin
+        - DOCKER_INFLUXDB_INIT_PASSWORD=my-admin
+        - DOCKER_INFLUXDB_INIT_ORG=my-org
+        - DOCKER_INFLUXDB_INIT_BUCKET=my-bucket
+        - DOCKER_INFLUXDB_INIT_RETENTION=1w
+        - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=123token
+
+  eclipse-mosquitto:
+    image: eclipse-mosquitto
+    stdin_open: true
+    tty: true
+    ports:
+        - 1883:1883
+        - 9005:9005
+    volumes:
+        - ./mosquitto/config:/mosquitto/config
+
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - '30000:3000'
+    volumes:
+      - ./grafana-storage:/var/lib/grafana
+
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    depends_on:
+      - influxdb
+      - eclipse-mosquitto
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    environment:
+      - HOSTNAME=telegraf
+    restart: unless-stopped
+
   frontend:
     build:
       context: ./sdis-emergency/Emergency-Manager/front
@@ -96,7 +145,7 @@ services:
     networks:
       - net
     ports:
-      - "3000:80"
+      - "3002:80"
     depends_on:
       - backend
     volumes:
